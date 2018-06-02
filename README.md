@@ -26,6 +26,9 @@ git clone https://github.com/codilingus/group-chat-backend.git
 - import project using IntelliJ
 - run GroupChatBackendApplication.class
 
-#### Database
+### API
+API will be available at http://localhost:8080/
+
+### Database
 Database is created by Spring in-memory. It is started everytime the project is opened.
 To kill the database close project. Note that all content will be cleared.
