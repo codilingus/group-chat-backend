@@ -15,6 +15,9 @@ public class Conversation {
         this.users = users;
     }
 
+    public Conversation() {
+    }
+
     public int getId() {
         return id;
     }
