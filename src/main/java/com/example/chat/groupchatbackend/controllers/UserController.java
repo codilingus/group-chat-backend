@@ -20,19 +20,16 @@ public class UserController {
 
     @PostMapping("/registration")
     public ResponseEntity register(@RequestBody User user) {
-        if (user.getId() != null) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("User already exists");
-        } else {
+        if (user.getId() == null) {
             try {
                 userRepository.save(user);
                 return new ResponseEntity(HttpStatus.OK);
             } catch (DataIntegrityViolationException e) {
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body("User already exists");
+                //empty intentionally
             }
         }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("User already exists");
     }
 }
