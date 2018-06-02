@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,12 +10,17 @@ import javax.persistence.Id;
 public class User {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     private String name;
     private String surname;
+
+    @Column(unique = true)
     private String username;
+
     private String password;
+
+    @Column(unique = true)
     private String email;
 
     public User(String name, String surname, String username, String password, String email) {
@@ -28,7 +34,7 @@ public class User {
     public User() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
