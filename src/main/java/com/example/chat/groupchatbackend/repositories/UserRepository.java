@@ -1,7 +1,9 @@
-package com.example.chat.groupchatbackend.Repositories;
+package com.example.chat.groupchatbackend.repositories;
 
 import com.example.chat.groupchatbackend.User;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface UserRepository extends CrudRepository<User, Integer> {
 }

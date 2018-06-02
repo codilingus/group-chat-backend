@@ -1,6 +1,6 @@
 package com.example.chat.groupchatbackend;
 
-import com.example.chat.groupchatbackend.Repositories.UserRepository;
+import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
