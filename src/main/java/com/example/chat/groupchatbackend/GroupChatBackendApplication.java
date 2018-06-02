@@ -8,5 +8,6 @@ public class GroupChatBackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(GroupChatBackendApplication.class, args);
+		
 	}
 }
