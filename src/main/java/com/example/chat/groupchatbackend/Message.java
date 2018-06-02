@@ -15,7 +15,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(int id, int senderId, String text, LocalDateTime timestamp) {
+    public Message(int senderId, String text, LocalDateTime timestamp) {
         this.id = id;
         this.senderId = senderId;
         this.text = text;
