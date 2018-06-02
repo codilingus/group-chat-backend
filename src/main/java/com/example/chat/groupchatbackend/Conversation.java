@@ -1,4 +1,5 @@
-import com.example.chat.groupchatbackend.Message;
+package com.example.chat.groupchatbackend;
+
 import java.util.List;
 
 public class Conversation {
