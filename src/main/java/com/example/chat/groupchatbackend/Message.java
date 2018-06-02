@@ -1,9 +1,12 @@
-package message;
-
+package com.example.chat.groupchatbackend;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
-
+@Entity
 public class Message {
-
+    @Id
+    @GeneratedValue
     private int id;
     private int senderId;
     private String text;
