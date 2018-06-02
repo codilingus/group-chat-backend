@@ -1,4 +1,6 @@
 import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.User;
+
 import java.util.List;
 
 public class Conversation {
