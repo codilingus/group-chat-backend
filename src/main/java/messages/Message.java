@@ -1,4 +1,4 @@
-package com.example.chat.groupchatbackend;
+package messages;
 
 import java.time.LocalDateTime;
 
