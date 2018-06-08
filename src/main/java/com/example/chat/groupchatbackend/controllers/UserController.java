@@ -13,16 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
-
 
 @RestController
 public class UserController {
@@ -73,6 +67,13 @@ public class UserController {
         Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
         message.setText(text);
         return message;
+    }
+
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity deleteMessage(@PathVariable int id){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        messagesRepository.delete(message);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/me")
