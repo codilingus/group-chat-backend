@@ -1,8 +1,5 @@
 package com.example.chat.groupchatbackend;
 
-import com.example.chat.groupchatbackend.Message;
-import com.example.chat.groupchatbackend.User;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -17,14 +14,16 @@ public class Conversation {
     @ElementCollection
     @OneToMany
     private List<Message> messages;
+    private ConversationType conversationType;
 
     @ElementCollection
     @ManyToMany
     private List<User> users;
 
-    public Conversation(List<Message> messages, List<User> users) {
+    public Conversation(List<Message> messages, List<User> users, ConversationType conversationType) {
         this.messages = messages;
         this.users = users;
+        this.conversationType = conversationType;
     }
 
     public Conversation() {
