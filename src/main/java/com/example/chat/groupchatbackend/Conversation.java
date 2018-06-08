@@ -29,6 +29,22 @@ public class Conversation {
     public Conversation() {
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ConversationType getConversationType() {
+        return conversationType;
+    }
+
+    public void setConversationType(ConversationType conversationType) {
+        this.conversationType = conversationType;
+    }
+
     public int getId() {
         return id;
     }
