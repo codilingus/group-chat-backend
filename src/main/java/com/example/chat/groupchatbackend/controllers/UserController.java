@@ -16,6 +16,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 
 @RestController
@@ -67,5 +73,12 @@ public class UserController {
         Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
         message.setText(text);
         return message;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity me(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userRepository.findById(1));
     }
 }
