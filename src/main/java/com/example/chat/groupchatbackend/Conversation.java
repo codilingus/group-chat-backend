@@ -10,8 +10,10 @@ import java.util.List;
 public class Conversation {
 
     @Id
+    @GeneratedValue
     private int id;
-
+    @Column(unique = true)
+    private String name;
     @ElementCollection
     @OneToMany
     private List<Message> messages;
