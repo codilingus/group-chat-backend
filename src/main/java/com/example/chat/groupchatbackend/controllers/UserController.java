@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -62,4 +64,16 @@ public class UserController {
         return conversationsRepository.findByName(conversationName).orElseThrow(() -> new RuntimeException());
     }
 
+    @GetMapping("/messages")
+    public Iterable<Message> getAllMessages(){
+        return messagesRepository.findAll();
+    }
+
+    @PutMapping("/messages/{id}")
+    @Transactional
+    public Message editMessage(@PathVariable int id, @RequestBody String text){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        message.setText(text);
+        return message;
+    }
 }
