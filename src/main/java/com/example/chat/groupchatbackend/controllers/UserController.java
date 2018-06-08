@@ -1,5 +1,6 @@
 package com.example.chat.groupchatbackend.controllers;
 
+import com.example.chat.groupchatbackend.Conversation;
 import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.User;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -52,6 +55,21 @@ public class UserController {
 //           return StreamSupport.stream(messagesRepository.findAll().spliterator(), false)
 //                   .filter(message -> message.getTimestamp().isAfter(timestamp))
        return null;
+    }
+
+    @PostMapping("/messages/{conversationName}")
+    public void postMessageToConversation(
+            @PathVariable("conversationName") String conversationName,
+            @RequestBody String text) {
+        if (conversationsRepository.findByName(conversationName).isPresent()) {
+            Message message = new Message(1, text, LocalDateTime.now());
+            messagesRepository.save(message);
+            Conversation conversation = conversationsRepository.findByName(conversationName).get();
+            conversation.getMessages().add(message);
+            conversationsRepository.save(conversation);
+        } else {
+            throw new EntityNotFoundException("Conversation with such name doesn't exists");
+        }
     }
 
 }
