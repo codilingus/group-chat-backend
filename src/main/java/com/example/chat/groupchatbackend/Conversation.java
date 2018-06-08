@@ -20,8 +20,7 @@ public class Conversation {
     @ManyToMany
     private List<User> users;
 
-    public Conversation(int id, List<Message> messages, List<User> users) {
-        this.id = id;
+    public Conversation(List<Message> messages, List<User> users) {
         this.messages = messages;
         this.users = users;
     }
