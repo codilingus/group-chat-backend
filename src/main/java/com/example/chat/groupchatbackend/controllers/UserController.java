@@ -12,12 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -45,6 +44,8 @@ public class UserController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("User already exists");
     }
+
+
 
     @GetMapping("/messages/{conversationName}?newerThan={timestamp}")
     public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp) {
