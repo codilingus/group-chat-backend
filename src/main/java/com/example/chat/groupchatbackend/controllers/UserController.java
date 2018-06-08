@@ -1,5 +1,6 @@
 package com.example.chat.groupchatbackend.controllers;
 
+import com.example.chat.groupchatbackend.Conversation;
 import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.User;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
@@ -11,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 
 @RestController
@@ -42,16 +45,21 @@ public class UserController {
     }
 
     @GetMapping("/messages/{conversationName}?newerThan={timestamp}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp){
-//       if(timestamp == null){
-//            return StreamSupport.stream(conversationsRepository.findByName(conversationName), false)
-//                    .filter(conversation -> conversation.getName().equals(conversationName))
-//                   .
+    public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp) {
+        if (timestamp == null) {
+            Conversation conversation = getConversation(conversationName);
+            return conversation.getMessages();
+        } else {
+            Conversation conversation = getConversation(conversationName);
+            LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+            return conversation.getMessages().stream()
+                    .filter(message -> message.getTimestamp().isAfter(date))
+                    .collect(Collectors.toList());
+        }
+    }
 
-//       }else{
-//           return StreamSupport.stream(messagesRepository.findAll().spliterator(), false)
-//                   .filter(message -> message.getTimestamp().isAfter(timestamp))
-       return null;
+    private Conversation getConversation(@PathVariable String conversationName) {
+        return conversationsRepository.findByName(conversationName).orElseThrow(() -> new RuntimeException());
     }
 
 }
