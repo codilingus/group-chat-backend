@@ -12,12 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,10 +45,8 @@ public class UserController {
                 .body("User already exists");
     }
 
-
-
-    @GetMapping("/messages/{conversationName}?newerThan={timestamp}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp) {
+    @GetMapping("/messages/{conversationName}")
+    public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(name = "newerThan", required = false) Long timestamp) {
         if (timestamp == null) {
             Conversation conversation = getConversation(conversationName);
             return conversation.getMessages();
@@ -82,27 +79,27 @@ public class UserController {
     }
 
     @GetMapping("/messages")
-    public Iterable<Message> getAllMessages(){
+    public Iterable<Message> getAllMessages() {
         return messagesRepository.findAll();
     }
 
     @PutMapping("/messages/{id}")
     @Transactional
-    public Message editMessage(@PathVariable int id, @RequestBody String text){
+    public Message editMessage(@PathVariable int id, @RequestBody String text) {
         Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
         message.setText(text);
         return message;
     }
 
     @DeleteMapping("/messages/{id}")
-    public ResponseEntity deleteMessage(@PathVariable int id){
+    public ResponseEntity deleteMessage(@PathVariable int id) {
         Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
         messagesRepository.delete(message);
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/me")
-    public ResponseEntity me(){
+    public ResponseEntity me() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userRepository.findById(1));

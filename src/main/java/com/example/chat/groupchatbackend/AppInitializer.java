@@ -24,7 +24,7 @@ public class AppInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         User user = new User("alek" , "kotowicz" , "alekot" , "qwerty" , "alek@alek");
         Message message = new Message(1, "Cześ", LocalDateTime.now());
-        Conversation conversation = new Conversation("conversation1", Arrays.asList(message), Arrays.asList(user));
+        Conversation conversation = new Conversation("conversation1", Arrays.asList(message), Arrays.asList(user), ConversationType.CHANNEL);
         userRepository.save(user);
         messagesRepository.save(message);
         conversationsRepository.save(conversation);
