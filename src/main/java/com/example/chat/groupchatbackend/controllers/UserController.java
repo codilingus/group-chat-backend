@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +56,21 @@ public class UserController {
             return conversation.getMessages().stream()
                     .filter(message -> message.getTimestamp().isAfter(date))
                     .collect(Collectors.toList());
+        }
+    }
+
+    @PostMapping("/messages/{conversationName}")
+    public void postMessageToConversation(
+            @PathVariable("conversationName") String conversationName,
+            @RequestBody String text) {
+        if (conversationsRepository.findByName(conversationName).isPresent()) {
+            Message message = new Message(1, text, LocalDateTime.now());
+            messagesRepository.save(message);
+            Conversation conversation = conversationsRepository.findByName(conversationName).get();
+            conversation.getMessages().add(message);
+            conversationsRepository.save(conversation);
+        } else {
+            throw new EntityNotFoundException("Conversation with such name doesn't exists");
         }
     }
 
