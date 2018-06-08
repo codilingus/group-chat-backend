@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -54,4 +56,16 @@ public class UserController {
        return null;
     }
 
+    @GetMapping("/messages")
+    public Iterable<Message> getAllMessages(){
+        return messagesRepository.findAll();
+    }
+
+    @PutMapping("/messages/{id}")
+    @Transactional
+    public Message editMessage(@PathVariable int id, @RequestBody String text){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        message.setText(text);
+        return message;
+    }
 }
