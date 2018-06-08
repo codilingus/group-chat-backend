@@ -1,18 +1,27 @@
+package com.example.chat.groupchatbackend;
+
 import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.User;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
 public class Conversation {
 
+    @Id
     private int id;
-    private String name;
+
+    @ElementCollection
+    @OneToMany
     private List<Message> messages;
+
+    @ElementCollection
+    @ManyToMany
     private List<User> users;
 
-    public Conversation(int id, String name, List<Message> messages, List<User> users) {
+    public Conversation(int id, List<Message> messages, List<User> users) {
         this.id = id;
-        this.name = name;
         this.messages = messages;
         this.users = users;
     }
@@ -26,14 +35,6 @@ public class Conversation {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Message> getMessages() {
