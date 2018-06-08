@@ -12,12 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 
 @RestController
 public class UserController {
@@ -45,31 +45,47 @@ public class UserController {
     }
 
     @GetMapping("/messages/{conversationName}?newerThan={timestamp}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp){
-//       if(timestamp == null){
-//            return StreamSupport.stream(conversationsRepository.findByName(conversationName), false)
-//                    .filter(conversation -> conversation.getName().equals(conversationName))
-//                   .
-
-//       }else{
-//           return StreamSupport.stream(messagesRepository.findAll().spliterator(), false)
-//                   .filter(message -> message.getTimestamp().isAfter(timestamp))
-       return null;
-    }
-
-    @PostMapping("/messages/{conversationName}")
-    public void postMessageToConversation(
-            @PathVariable("conversationName") String conversationName,
-            @RequestBody String text) {
-        if (conversationsRepository.findByName(conversationName).isPresent()) {
-            Message message = new Message(1, text, LocalDateTime.now());
-            messagesRepository.save(message);
-            Conversation conversation = conversationsRepository.findByName(conversationName).get();
-            conversation.getMessages().add(message);
-            conversationsRepository.save(conversation);
+    public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp) {
+        if (timestamp == null) {
+            Conversation conversation = getConversation(conversationName);
+            return conversation.getMessages();
         } else {
-            throw new EntityNotFoundException("Conversation with such name doesn't exists");
+            Conversation conversation = getConversation(conversationName);
+            LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+            return conversation.getMessages().stream()
+                    .filter(message -> message.getTimestamp().isAfter(date))
+                    .collect(Collectors.toList());
         }
     }
 
+    private Conversation getConversation(@PathVariable String conversationName) {
+        return conversationsRepository.findByName(conversationName).orElseThrow(() -> new RuntimeException());
+    }
+
+    @GetMapping("/messages")
+    public Iterable<Message> getAllMessages(){
+        return messagesRepository.findAll();
+    }
+
+    @PutMapping("/messages/{id}")
+    @Transactional
+    public Message editMessage(@PathVariable int id, @RequestBody String text){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        message.setText(text);
+        return message;
+    }
+
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity deleteMessage(@PathVariable int id){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        messagesRepository.delete(message);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity me(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userRepository.findById(1));
+    }
 }
