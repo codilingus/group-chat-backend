@@ -16,9 +16,10 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestController
 public class UserController {
@@ -61,6 +62,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/messages/{conversationName}")
+    public void postMessageToConversation(
+            @PathVariable("conversationName") String conversationName,
+            @RequestBody String text) {
+        if (conversationsRepository.findByName(conversationName).isPresent()) {
+            Message message = new Message(1, text, LocalDateTime.now());
+            messagesRepository.save(message);
+            Conversation conversation = conversationsRepository.findByName(conversationName).get();
+            conversation.getMessages().add(message);
+            conversationsRepository.save(conversation);
+        } else {
+            throw new EntityNotFoundException("Conversation with such name doesn't exists");
+        }
+    }
+
     private Conversation getConversation(@PathVariable String conversationName) {
         return conversationsRepository.findByName(conversationName).orElseThrow(() -> new RuntimeException());
     }
@@ -76,5 +92,19 @@ public class UserController {
         Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
         message.setText(text);
         return message;
+    }
+
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity deleteMessage(@PathVariable int id){
+        Message message = messagesRepository.findById(id).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        messagesRepository.delete(message);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity me(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userRepository.findById(1));
     }
 }
