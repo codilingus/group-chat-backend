@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend.controllers;
 
 import com.example.chat.groupchatbackend.Conversation;
+import com.example.chat.groupchatbackend.ConversationType;
 import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.User;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
@@ -30,7 +31,7 @@ public class ConversationController {
                     .body("incorrect name");
         }
 
-        Conversation conversation = new Conversation(name, new LinkedList<Message>(), new LinkedList<User>());
+        Conversation conversation = new Conversation(name, new LinkedList<Message>(), new LinkedList<User>(), ConversationType.CHANNEL);
         conversation.getUsers().add(userRepository.findById(1).get());
         conversationsRepository.save(conversation);
 
