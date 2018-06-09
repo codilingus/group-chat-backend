@@ -10,6 +10,10 @@ public class MyUserPrincipal implements UserDetails {
 
     private User user;
 
+    public User getUser() {
+        return user;
+    }
+
     public MyUserPrincipal(User user) {
         this.user = user;
     }
