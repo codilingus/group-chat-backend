@@ -10,8 +10,10 @@ import java.util.List;
 public class Conversation {
 
     @Id
+    @GeneratedValue
     private int id;
-
+    @Column(unique = true)
+    private String name;
     @ElementCollection
     @OneToMany
     private List<Message> messages;
@@ -20,7 +22,8 @@ public class Conversation {
     @ManyToMany
     private List<User> users;
 
-    public Conversation(List<Message> messages, List<User> users) {
+    public Conversation(String name, List<Message> messages, List<User> users) {
+        this.name = name;
         this.messages = messages;
         this.users = users;
     }
