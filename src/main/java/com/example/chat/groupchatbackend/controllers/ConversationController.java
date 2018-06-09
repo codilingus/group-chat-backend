@@ -1,9 +1,6 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.ConversationType;
-import com.example.chat.groupchatbackend.Message;
-import com.example.chat.groupchatbackend.User;
+import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +41,21 @@ public class ConversationController {
     }
 
     @GetMapping("/channels")
-    public List<Conversation> getAllChannels(){
+    public List<BasicConversation> getAllChannels() {
+        return getBasicConversations(ConversationType.CHANNEL);
+    }
+
+    @GetMapping("/direct-messages")
+    public List<BasicConversation> getAllDirectMessages() {
+        return getBasicConversations(ConversationType.DIRECT_MESSAGE);
+    }
+
+    private List<BasicConversation> getBasicConversations(ConversationType conversationType) {
         Iterable<Conversation> channelsIterable = conversationsRepository.findAll();
         List<Conversation> channels = (List<Conversation>) channelsIterable;
         return channels.stream()
-                .filter(channel -> channel.getConversationType().equals(ConversationType.CHANNEL))
+                .filter(channel -> channel.getConversationType().equals(conversationType))
+                .map(conversation -> new BasicConversation(conversation.getId(), conversation.getName()))
                 .collect(Collectors.toList());
     }
 }
