@@ -2,6 +2,7 @@ package com.example.chat.groupchatbackend;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,8 +20,6 @@ public class User {
 
     @Column(unique = true)
     private String username;
-
-    @JsonIgnore
     private String password;
 
     @Column(unique = true)
@@ -69,10 +68,12 @@ public class User {
         this.username = username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
+    @JsonSetter("password")
     public void setPassword(String password) {
         this.password = password;
     }
