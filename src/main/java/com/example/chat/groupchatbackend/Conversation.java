@@ -16,15 +16,17 @@ public class Conversation {
     @JsonIgnore
     @OneToMany
     private List<Message> messages;
+    private ConversationType conversationType;
 
     @ElementCollection
     @ManyToMany
     private List<User> users;
 
-    public Conversation(String name, List<Message> messages, List<User> users) {
+    public Conversation(String name, List<Message> messages, List<User> users, ConversationType conversationType) {
         this.name = name;
         this.messages = messages;
         this.users = users;
+        this.conversationType = conversationType;
     }
 
     public Conversation() {
@@ -52,6 +54,14 @@ public class Conversation {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public ConversationType getConversationType() {
+        return conversationType;
+    }
+
+    public void setConversationType(ConversationType conversationType) {
+        this.conversationType = conversationType;
     }
 
     public List<User> getUsers() {
