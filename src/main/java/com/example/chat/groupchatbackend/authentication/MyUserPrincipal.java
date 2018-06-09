@@ -10,12 +10,12 @@ public class MyUserPrincipal implements UserDetails {
 
     private User user;
 
-    public User getUser() {
-        return user;
-    }
-
     public MyUserPrincipal(User user) {
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
@@ -53,7 +53,4 @@ public class MyUserPrincipal implements UserDetails {
         return true;
     }
 
-    public User getUser() {
-        return user;
-    }
 }
