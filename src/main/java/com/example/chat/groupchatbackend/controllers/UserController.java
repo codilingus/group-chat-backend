@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 public class UserController {
@@ -103,5 +104,10 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userRepository.findById(1));
+    }
+
+    @GetMapping("/users")
+    public Iterable<User> getAllUsers(){
+        return userRepository.findAll();
     }
 }
