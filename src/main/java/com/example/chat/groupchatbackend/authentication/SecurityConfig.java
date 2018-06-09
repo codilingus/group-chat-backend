@@ -7,6 +7,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +36,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().httpBasic()
                 .and()
                 .logout()
-                .permitAll();
+                .permitAll()
+                .and()
+                .sessionManagement()
+                .maximumSessions(100).sessionRegistry(sessionRegistry());
     }
 
     public DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -42,5 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setUserDetailsService(dbUserDetailsService);
         authenticationProvider.setPasswordEncoder(new PlainTextPasswordEncoder());
         return authenticationProvider;
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 }
