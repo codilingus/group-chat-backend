@@ -45,8 +45,6 @@ public class UserController {
                 .body("User already exists");
     }
 
-
-
     @GetMapping("/messages/{conversationName}?newerThan={timestamp}")
     public List<Message> getAllMessages(@PathVariable String conversationName, @PathVariable Long timestamp) {
         if (timestamp == null) {
