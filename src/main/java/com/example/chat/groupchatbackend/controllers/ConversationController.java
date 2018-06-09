@@ -1,20 +1,18 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.ConversationType;
-import com.example.chat.groupchatbackend.Message;
-import com.example.chat.groupchatbackend.User;
+import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "*", allowCredentials = "true", maxAge = 3600L)
 @RestController
 public class ConversationController {
 
@@ -38,6 +36,40 @@ public class ConversationController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(conversation);
+    }
+
+    @GetMapping("/channels")
+    public List<BasicConversation> getAllChannels() {
+        return getBasicConversations(ConversationType.CHANNEL);
+    }
+
+    @GetMapping("/direct-messages")
+    public List<BasicConversation> getAllDirectMessages() {
+        return getBasicConversations(ConversationType.DIRECT_MESSAGE);
+    }
+
+    private List<BasicConversation> getBasicConversations(ConversationType conversationType) {
+        List<Conversation> channels = conversationsRepository.findAllByConversationType(conversationType);
+        return channels.stream()
+                .map(conversation -> new BasicConversation(conversation.getId(), conversation.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/channels/{id}/users")
+    public ResponseEntity getAllChannelMembers(@PathVariable int id) {
+        Conversation conversation = conversationsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
+            List<BasicUser> result = conversation.getUsers().stream()
+                    .map(user -> new BasicUser(user.getUsername(), user.getName()))
+                    .collect(Collectors.toList());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(result);
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("not channel");
     }
 }
 
