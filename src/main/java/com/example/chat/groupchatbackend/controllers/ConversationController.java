@@ -6,10 +6,7 @@ import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +54,23 @@ public class ConversationController {
                 .filter(channel -> channel.getConversationType().equals(conversationType))
                 .map(conversation -> new BasicConversation(conversation.getId(), conversation.getName()))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/channels/{id}/users")
+    public ResponseEntity getAllChannelMembers(@PathVariable int id){
+        Conversation conversation = conversationsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+        if(conversation.getConversationType().equals(ConversationType.CHANNEL)){
+            List<BasicUser> result = conversation.getUsers().stream()
+                    .map(user -> new BasicUser(user.getUsername(), user.getName()))
+                    .collect(Collectors.toList());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(result);
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("not channel");
     }
 }
 
