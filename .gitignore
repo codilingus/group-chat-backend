@@ -15,7 +15,7 @@
 *.iws
 *.iml
 *.ipr
-chat-db.mv.db
+chat-db.*
 
 ### NetBeans ###
 /nbproject/private/
