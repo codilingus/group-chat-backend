@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,10 +36,15 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity me(){
+    public ResponseEntity me() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userRepository.findById(1));
+    }
+
+    @GetMapping("/users")
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @GetMapping("/users/active")
