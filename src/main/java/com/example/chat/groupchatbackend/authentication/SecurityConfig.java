@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 @Component
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private DbUserDetailsService dbUserDetailsService;
 
@@ -24,16 +25,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable()
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeRequests()
                 .antMatchers("/registration").permitAll()
-                .antMatchers(HttpMethod.OPTIONS,  "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic()
-                .and()
-                .logout()
+                .and().cors()
+                .and().logout()
                 .permitAll();
     }
 
@@ -43,4 +43,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setPasswordEncoder(new PlainTextPasswordEncoder());
         return authenticationProvider;
     }
+
 }
