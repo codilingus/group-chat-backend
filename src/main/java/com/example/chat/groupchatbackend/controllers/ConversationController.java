@@ -20,6 +20,8 @@ public class ConversationController {
     private ConversationsRepository conversationsRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserContext userContext;
 
     @PostMapping("/channel")
     public ResponseEntity createChannel(@RequestBody String name) {
@@ -30,7 +32,7 @@ public class ConversationController {
         }
 
         Conversation conversation = new Conversation(name, new LinkedList<Message>(), new LinkedList<User>(), ConversationType.CHANNEL);
-        conversation.getUsers().add(userRepository.findById(1).get());
+        conversation.getUsers().add(userContext.getCurrentUser());
         conversationsRepository.save(conversation);
 
         return ResponseEntity
