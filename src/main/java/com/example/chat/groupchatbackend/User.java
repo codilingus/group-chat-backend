@@ -1,8 +1,5 @@
 package com.example.chat.groupchatbackend;
 
-
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

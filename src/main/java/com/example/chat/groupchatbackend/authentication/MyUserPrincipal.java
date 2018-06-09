@@ -3,6 +3,7 @@ package com.example.chat.groupchatbackend.authentication;
 import com.example.chat.groupchatbackend.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 
 public class MyUserPrincipal implements UserDetails {
