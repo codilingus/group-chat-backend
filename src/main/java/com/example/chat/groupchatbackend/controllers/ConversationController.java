@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "*", allowCredentials = "true", maxAge = 3600L)
 @RestController
 public class ConversationController {
 
@@ -48,19 +49,17 @@ public class ConversationController {
     }
 
     private List<BasicConversation> getBasicConversations(ConversationType conversationType) {
-        Iterable<Conversation> channelsIterable = conversationsRepository.findAll();
-        List<Conversation> channels = (List<Conversation>) channelsIterable;
+        List<Conversation> channels = conversationsRepository.findAllByConversationType(conversationType);
         return channels.stream()
-                .filter(channel -> channel.getConversationType().equals(conversationType))
                 .map(conversation -> new BasicConversation(conversation.getId(), conversation.getName()))
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/channels/{id}/users")
-    public ResponseEntity getAllChannelMembers(@PathVariable int id){
+    public ResponseEntity getAllChannelMembers(@PathVariable int id) {
         Conversation conversation = conversationsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
-        if(conversation.getConversationType().equals(ConversationType.CHANNEL)){
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
             List<BasicUser> result = conversation.getUsers().stream()
                     .map(user -> new BasicUser(user.getUsername(), user.getName()))
                     .collect(Collectors.toList());
