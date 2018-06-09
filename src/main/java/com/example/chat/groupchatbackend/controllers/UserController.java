@@ -1,16 +1,26 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.repositories.UserRepository;
+import com.example.chat.groupchatbackend.Conversation;
+import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.User;
-import org.hibernate.exception.ConstraintViolationException;
+import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
+import com.example.chat.groupchatbackend.repositories.MessagesRepository;
+import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -34,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity me(){
+    public ResponseEntity me() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userRepository.findById(1));
