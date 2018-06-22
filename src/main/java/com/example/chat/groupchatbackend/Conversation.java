@@ -72,7 +72,12 @@ public class Conversation {
         this.users = users;
     }
 
-    public boolean checkUser(User user){
-        return this.users.contains(user);
+    public boolean checkUserPresenceInConversation(User user){
+        for (User currentUser : getUsers()){
+            if(currentUser.getId().equals(user.getId())){
+                return true;
+            }
+        }
+        return false;
     }
 }
