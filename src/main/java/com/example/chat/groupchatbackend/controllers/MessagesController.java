@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend.controllers;
 
 import com.example.chat.groupchatbackend.Conversation;
+import com.example.chat.groupchatbackend.ConversationType;
 import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
@@ -25,15 +26,25 @@ public class MessagesController {
     private MessagesRepository messagesRepository;
 
     @GetMapping("/messages/channel/{id}")
-    public List<Message> getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
+    public ResponseEntity getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
         Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
-
-        if (timestamp == null) {
-            return getMessagesByDate(conversation, LocalDateTime.MIN);
-        } else {
-            LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            return getMessagesByDate(conversation, date);
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
+            if (timestamp == null) {
+                List<Message> result = getMessagesByDate(conversation, LocalDateTime.MIN);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(result);
+            } else {
+                LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+                List<Message> result =  getMessagesByDate(conversation, date);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(result);
+            }
         }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("not channel");
     }
 
     private List<Message> getMessagesByDate(Conversation conversation, LocalDateTime date) {
