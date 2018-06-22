@@ -71,4 +71,14 @@ public class Conversation {
     public void setUsers(List<User> users) {
         this.users = users;
     }
+
+    public boolean checkIfUserIsInConversation(User user){
+        for (User currentUser : getUsers()){
+            if(currentUser.getId().equals(user.getId())){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

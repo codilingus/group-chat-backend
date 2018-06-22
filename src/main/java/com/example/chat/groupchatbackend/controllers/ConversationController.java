@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,5 +74,30 @@ public class ConversationController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("not channel");
     }
+
+    @PutMapping("/channels/{id}/join")
+    @Transactional
+    public ResponseEntity joinChannel(@PathVariable int id){
+        Conversation conversation = conversationsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+        User currentUser = userContext.getCurrentUser();
+
+        if(conversation.getConversationType().equals(ConversationType.CHANNEL) && currentUser != null){
+            if(!conversation.checkIfUserIsInConversation(currentUser)) {
+                conversation.getUsers().add(currentUser);
+                return new ResponseEntity(HttpStatus.OK);
+            }
+            else {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("you are already in this conversation");
+            }
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("failed to join");
+    }
+
+
 }
 
