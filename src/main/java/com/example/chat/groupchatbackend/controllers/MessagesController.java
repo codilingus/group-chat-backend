@@ -1,9 +1,10 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
+import com.example.chat.groupchatbackend.repositories.ReadStatusRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
+import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,17 +25,30 @@ public class MessagesController {
     private ConversationsRepository conversationsRepository;
     @Autowired
     private MessagesRepository messagesRepository;
+    @Autowired
+    private ReadStatusRepository readStatusRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserContext userContext;
 
     @GetMapping("/messages/{conversationName}")
     public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
         Conversation conversation = getConversation(conversationName);
 
         if (timestamp == null) {
+            updateReadStatus(conversation, LocalDateTime.now());
             return getMessagesByDate(conversation, LocalDateTime.MIN);
         } else {
             LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+            updateReadStatus(conversation, date);
             return getMessagesByDate(conversation, date);
         }
+    }
+
+    private void updateReadStatus(Conversation conversation, LocalDateTime date) {
+        ReadStatus readStatus = new ReadStatus(conversation.getId(), userContext.getCurrentUser().getId(), date);
+        readStatusRepository.save(readStatus);
     }
 
     private List<Message> getMessagesByDate(Conversation conversation, LocalDateTime date) {
