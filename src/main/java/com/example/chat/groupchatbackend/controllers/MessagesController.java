@@ -24,9 +24,9 @@ public class MessagesController {
     @Autowired
     private MessagesRepository messagesRepository;
 
-    @GetMapping("/messages/{conversationName}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
-        Conversation conversation = getConversation(conversationName);
+    @GetMapping("/messages/channel/{id}")
+    public List<Message> getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
+        Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
 
         if (timestamp == null) {
             return getMessagesByDate(conversation, LocalDateTime.MIN);
