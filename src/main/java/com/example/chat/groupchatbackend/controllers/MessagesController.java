@@ -47,7 +47,7 @@ public class MessagesController {
     }
 
     private void updateReadStatus(Conversation conversation, LocalDateTime date) {
-        ReadStatus readStatus = new ReadStatus(conversation.getId(), userContext.getCurrentUser().getId(), date);
+        ReadStatus readStatus = new ReadStatus(conversation, userContext.getCurrentUser(), date);
         readStatusRepository.save(readStatus);
     }
 

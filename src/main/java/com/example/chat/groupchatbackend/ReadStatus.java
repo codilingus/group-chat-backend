@@ -1,8 +1,6 @@
 package com.example.chat.groupchatbackend;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,23 +9,25 @@ public class ReadStatus {
     @Id
     @GeneratedValue
     private int id;
-    private int conversationId;
-    private int userId;
+    @ManyToOne
+    private Conversation conversation;
+    @ManyToOne
+    private User user;
     private LocalDateTime lastReadTimeStamp;
 
     public ReadStatus() {
     }
 
-    public ReadStatus(int id, int conversationId, int userId, LocalDateTime lastReadTimeStamp) {
+    public ReadStatus(int id, Conversation conversation, User user, LocalDateTime lastReadTimeStamp) {
         this.id = id;
-        this.conversationId = conversationId;
-        this.userId = userId;
+        this.conversation = conversation;
+        this.user = user;
         this.lastReadTimeStamp = lastReadTimeStamp;
     }
 
-    public ReadStatus(int conversationId, int userId, LocalDateTime lastReadTimeStamp) {
-        this.conversationId = conversationId;
-        this.userId = userId;
+    public ReadStatus(Conversation conversation, User user, LocalDateTime lastReadTimeStamp) {
+        this.conversation = conversation;
+        this.user = user;
         this.lastReadTimeStamp = lastReadTimeStamp;
     }
 
@@ -39,20 +39,20 @@ public class ReadStatus {
         this.id = id;
     }
 
-    public int getConversationId() {
-        return conversationId;
+    public Conversation getConversation() {
+        return conversation;
     }
 
-    public void setConversationId(int conversationId) {
-        this.conversationId = conversationId;
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public LocalDateTime getLastReadTimeStamp() {
