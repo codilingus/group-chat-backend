@@ -90,7 +90,7 @@ public class MessagesController {
                orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
 
        User user = userContext.getCurrentUser();
-       if(conversation.checkUser(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)){
+       if(conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)){
            if (timestamp == null) {
                return getMessagesByDate(conversation, LocalDateTime.MIN);
            } else {
