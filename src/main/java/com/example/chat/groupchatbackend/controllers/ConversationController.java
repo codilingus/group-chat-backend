@@ -82,7 +82,7 @@ public class ConversationController {
         User currentUser = userContext.getCurrentUser();
 
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
-            if (conversation.checkIfUserIsInConversation(currentUser)) {
+            if (conversation.checkPresenceInConversation(currentUser)) {
                 conversation.getUsers().removeIf(user -> user.getId().equals(currentUser.getId()));
                 conversationsRepository.save(conversation);
             }
