@@ -2,10 +2,8 @@ package com.example.chat.groupchatbackend.repositories;
 
 import com.example.chat.groupchatbackend.Conversation;
 import com.example.chat.groupchatbackend.ConversationType;
-import com.example.chat.groupchatbackend.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +16,6 @@ public interface ConversationsRepository extends CrudRepository<Conversation, In
 
     List<Conversation> findAllByConversationType(ConversationType conversationType);
 
+    @Query(value = "select c from Conversation c join c.messages m where m.id = ?1")
+    Conversation findByMessageId(int messageId);
 }

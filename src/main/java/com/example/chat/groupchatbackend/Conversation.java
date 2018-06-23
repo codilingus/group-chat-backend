@@ -70,4 +70,8 @@ public class Conversation {
     public void setUsers(List<User> users) {
         this.users = users;
     }
+
+    public boolean checkUserPresenceInConversation(User user){
+       return getUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()));
+    }
 }
