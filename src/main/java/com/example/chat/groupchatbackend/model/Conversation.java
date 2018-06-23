@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Conversation {
@@ -73,6 +74,12 @@ public class Conversation {
     }
 
     public boolean checkUserPresenceInConversation(User user) {
-        return getUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()));
+        return getUsers().stream().anyMatch(member -> member.getId().equals(user.getId()));
+    }
+
+    public List<Integer> getUsersIds() {
+        return getUsers().stream()
+                .map(user -> user.getId())
+                .collect(Collectors.toList());
     }
 }

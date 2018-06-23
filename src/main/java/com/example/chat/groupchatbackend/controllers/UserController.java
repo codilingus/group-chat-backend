@@ -1,8 +1,8 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.model.User;
 import com.example.chat.groupchatbackend.authentication.UserContext;
 import com.example.chat.groupchatbackend.authentication.UserSessionContext;
+import com.example.chat.groupchatbackend.model.User;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,7 +21,6 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private UserContext userContext;
-
     @Autowired
     private UserSessionContext userSessionContext;
 
@@ -41,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity me() {
+    public ResponseEntity<User> me() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userContext.getCurrentUser());
@@ -54,8 +53,7 @@ public class UserController {
 
     @GetMapping("/users/active")
     public List<Integer> getActiveUsers() {
-        List<User> usersFromSessionRegistry = userSessionContext.getUsersFromSessionRegistry();
-        return usersFromSessionRegistry.stream()
+        return userSessionContext.getUsersFromSessionRegistry().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
     }
