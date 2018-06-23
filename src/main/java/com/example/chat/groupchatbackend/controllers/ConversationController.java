@@ -77,20 +77,19 @@ public class ConversationController {
 
     @PutMapping("/channels/{id}/join")
     @Transactional
-    public ResponseEntity joinChannel(@PathVariable int id){
+    public ResponseEntity joinChannel(@PathVariable int id) {
         Conversation conversation = conversationsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
         User currentUser = userContext.getCurrentUser();
 
-        if(conversation.getConversationType().equals(ConversationType.CHANNEL) && currentUser != null){
-            if(!conversation.checkIfUserIsInConversation(currentUser)) {
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL) && currentUser != null) {
+            if (!conversation.checkIfUserIsInConversation(currentUser)) {
                 conversation.getUsers().add(currentUser);
                 return new ResponseEntity(HttpStatus.OK);
-            }
-            else {
+            } else {
                 return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body("you are already in this conversation");
+                        .status(HttpStatus.OK)
+                        .body("you are in this conversation");
             }
         }
         return ResponseEntity
