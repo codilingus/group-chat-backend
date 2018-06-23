@@ -1,6 +1,8 @@
 package com.example.chat.groupchatbackend.controllers;
 
 import com.example.chat.groupchatbackend.authentication.UserContext;
+import com.example.chat.groupchatbackend.exceptions.BadRequestException;
+import com.example.chat.groupchatbackend.exceptions.NotFoundException;
 import com.example.chat.groupchatbackend.model.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
@@ -62,7 +64,7 @@ public class ConversationController {
     @GetMapping("/channels/{id}/users")
     public ResponseEntity getAllChannelMembers(@PathVariable int id) {
         Conversation conversation = conversationsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+                .orElseThrow(() -> new BadRequestException("conversation doesn't exist"));
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
             List<BasicUser> result = conversation.getUsers().stream()
                     .map(user -> new BasicUser(user.getUsername(), user.getName()))
@@ -80,7 +82,7 @@ public class ConversationController {
     @Transactional
     public ResponseEntity joinChannel(@PathVariable int id) {
         Conversation conversation = conversationsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("conversation doesn't exist"));
         User currentUser = userContext.getCurrentUser();
 
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
@@ -99,7 +101,7 @@ public class ConversationController {
     @PutMapping("/channels/{id}/leave")
     public ResponseEntity leaveChannel(@PathVariable int id) {
         Conversation conversation = conversationsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Conversation doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Conversation doesn't exist"));
 
         User currentUser = userContext.getCurrentUser();
 
@@ -113,6 +115,10 @@ public class ConversationController {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("Failed to leave channel");
+    }
+
+    private ResponseEntity exception(){
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 }
 
