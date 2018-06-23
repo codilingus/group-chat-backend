@@ -73,7 +73,7 @@ public class Conversation {
         this.users = users;
     }
 
-    public boolean checkPresenceInConversation(User user) {
+    public boolean checkUserPresenceInConversation(User user) {
         return getUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()));
     }
 }
