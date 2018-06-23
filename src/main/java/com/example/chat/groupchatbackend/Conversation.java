@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -72,5 +73,12 @@ public class Conversation {
         this.users = users;
     }
 
-
+    public boolean checkIfUserIsInConversation(User user) {
+        for (User currentUser : getUsers()) {
+            if (currentUser.getId().equals(user.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
