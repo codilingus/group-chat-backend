@@ -1,5 +1,8 @@
 package com.example.chat.groupchatbackend.controllers;
 
+import com.example.chat.groupchatbackend.Conversation;
+import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.UserContext;
 import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
@@ -26,16 +29,22 @@ public class MessagesController {
     @Autowired
     private UserContext userContext;
 
-    @GetMapping("/messages/{conversationName}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
-        Conversation conversation = getConversation(conversationName);
-
-        if (timestamp == null) {
-            return getMessagesByDate(conversation, LocalDateTime.MIN);
-        } else {
-            LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            return getMessagesByDate(conversation, date);
+    @GetMapping("/messages/channel/{id}")
+    public ResponseEntity getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
+        Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
+            LocalDateTime date = LocalDateTime.MIN;
+            if (timestamp != null) {
+                date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+            }
+            List<Message> result =  getMessagesByDate(conversation, date);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(result);
         }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("not channel");
     }
 
     private List<Message> getMessagesByDate(Conversation conversation, LocalDateTime date) {
@@ -69,15 +78,26 @@ public class MessagesController {
     @Transactional
     public Message editMessage(@PathVariable int id, @RequestBody String text) {
         Message message = getMessageById(id);
-        message.setText(text);
-        return message;
+        if (userContext.getCurrentUser().getId().equals(message.getSenderId())) {
+            message.setText(text);
+            return message;
+        } else {
+            throw new RuntimeException("You can't edit message");
+        }
     }
 
     @DeleteMapping("/messages/{id}")
     public ResponseEntity deleteMessage(@PathVariable int id) {
         Message message = getMessageById(id);
-        messagesRepository.delete(message);
-        return new ResponseEntity(HttpStatus.OK);
+        Conversation conversation = conversationsRepository.findByMessageId(id);
+        conversation.getMessages().removeIf(message1 -> message1.getId() == id);
+        conversationsRepository.save(conversation);
+        if (userContext.getCurrentUser().getId().equals(message.getSenderId())) {
+            messagesRepository.delete(message);
+            return new ResponseEntity(HttpStatus.OK);
+        } else {
+            return new ResponseEntity("You are not sender of message", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private Message getMessageById(int messageId) {
