@@ -1,8 +1,5 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.ConversationType;
-import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
@@ -33,18 +30,14 @@ public class MessagesController {
     public ResponseEntity getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
         Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
-            if (timestamp == null) {
-                List<Message> result = getMessagesByDate(conversation, LocalDateTime.MIN);
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(result);
-            } else {
-                LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                List<Message> result =  getMessagesByDate(conversation, date);
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(result);
+            LocalDateTime date = LocalDateTime.MIN;
+            if (timestamp != null) {
+                date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
             }
+            List<Message> result =  getMessagesByDate(conversation, date);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(result);
         }
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
