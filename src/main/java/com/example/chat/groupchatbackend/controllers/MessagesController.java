@@ -2,6 +2,7 @@ package com.example.chat.groupchatbackend.controllers;
 
 import com.example.chat.groupchatbackend.Conversation;
 import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.UserContext;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class MessagesController {
     private ConversationsRepository conversationsRepository;
     @Autowired
     private MessagesRepository messagesRepository;
+    @Autowired
+    private UserContext userContext;
+
 
     @GetMapping("/messages/{conversationName}")
     public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
@@ -68,19 +72,29 @@ public class MessagesController {
     @Transactional
     public Message editMessage(@PathVariable int id, @RequestBody String text) {
         Message message = getMessageById(id);
-        message.setText(text);
-        return message;
+        if (userContext.getCurrentUser().getId().equals(message.getSenderId())) {
+            message.setText(text);
+            return message;
+        } else {
+            throw new RuntimeException("You can't edit message");
+        }
     }
 
     @DeleteMapping("/messages/{id}")
     public ResponseEntity deleteMessage(@PathVariable int id) {
         Message message = getMessageById(id);
-        messagesRepository.delete(message);
-        return new ResponseEntity(HttpStatus.OK);
+        Conversation conversation = conversationsRepository.findByMessageId(id);
+        conversation.getMessages().removeIf(message1 -> message1.getId() == id);
+        conversationsRepository.save(conversation);
+        if (userContext.getCurrentUser().getId().equals(message.getSenderId())) {
+            messagesRepository.delete(message);
+            return new ResponseEntity(HttpStatus.OK);
+        } else {
+            return new ResponseEntity("You are not sender of message", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private Message getMessageById(int messageId) {
         return messagesRepository.findById(messageId).orElseThrow(() -> new RuntimeException("message doesn't exist"));
     }
-
 }
