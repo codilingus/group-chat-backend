@@ -85,12 +85,8 @@ public class ConversationController {
         if (conversation.getConversationType().equals(ConversationType.CHANNEL) && currentUser != null) {
             if (!conversation.checkIfUserIsInConversation(currentUser)) {
                 conversation.getUsers().add(currentUser);
-                return new ResponseEntity(HttpStatus.OK);
-            } else {
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body("you are in this conversation");
             }
+            return new ResponseEntity(HttpStatus.OK);
         }
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
