@@ -83,7 +83,7 @@ public class ConversationController {
         User currentUser = userContext.getCurrentUser();
 
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
-            if (!conversation.checkIfUserIsInConversation(currentUser)) {
+            if (!conversation.checkUserPresenceInConversation(currentUser)) {
                 conversation.getUsers().add(currentUser);
             }
             return new ResponseEntity(HttpStatus.OK);
