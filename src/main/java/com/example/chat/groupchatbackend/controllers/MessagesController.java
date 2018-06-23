@@ -36,16 +36,15 @@ public class MessagesController {
     private UserContext userContext;
 
     @GetMapping("/messages/channel/{id}")
-    public ResponseEntity getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
+    public ResponseEntity getAllMessages(@PathVariable int id, @RequestParam(required = false) Long timestamp) {
         Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
             LocalDateTime date = LocalDateTime.MIN;
-            updateReadStatus(conversation, date);
+            updateReadStatus(conversation);
             if (timestamp != null) {
                 date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                updateReadStatus(conversation, date);
             }
-            List<Message> result =  getMessagesByDate(conversation, date);
+            List<Message> result = getMessagesByDate(conversation, date);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(result);
@@ -56,18 +55,17 @@ public class MessagesController {
     }
 
     @GetMapping("/messages/private/{conversationId}")
-    public List <Message> getPrivateConversationMessagesWithUser(@PathVariable int conversationId, @RequestParam(required = false) Long timestamp) {
+    public List<Message> getPrivateConversationMessagesWithUser(@PathVariable int conversationId, @RequestParam(required = false) Long timestamp) {
         Conversation conversation = conversationsRepository.findById(conversationId).
                 orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
 
         User user = userContext.getCurrentUser();
-        if(conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)){
+        if (conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)) {
+            updateReadStatus(conversation);
             if (timestamp == null) {
-                updateReadStatus(conversation, LocalDateTime.now());
                 return getMessagesByDate(conversation, LocalDateTime.MIN);
             } else {
                 LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                updateReadStatus(conversation, date);
                 return getMessagesByDate(conversation, date);
             }
         } else {
@@ -75,8 +73,8 @@ public class MessagesController {
         }
     }
 
-    private void updateReadStatus(Conversation conversation, LocalDateTime date) {
-        ReadStatus readStatus = new ReadStatus(conversation, userContext.getCurrentUser(), date);
+    private void updateReadStatus(Conversation conversation) {
+        ReadStatus readStatus = new ReadStatus(conversation, userContext.getCurrentUser(), LocalDateTime.now());
         readStatusRepository.save(readStatus);
     }
 
