@@ -26,9 +26,9 @@ public class ConversationsComponent {
         conversationsRepository.save(conversation);
     }
 
-    public void addMessageToConversation(int conversationName, Message message) {
-        if (conversationsRepository.existsById(conversationName)) {
-            Conversation conversation = conversationsRepository.findById(conversationName).get();
+    public void addMessageToConversation(int conversationId, Message message) {
+        if (conversationsRepository.existsById(conversationId)) {
+            Conversation conversation = conversationsRepository.findById(conversationId).get();
             conversation.getMessages().add(message);
             conversationsRepository.save(conversation);
         } else {
@@ -36,16 +36,16 @@ public class ConversationsComponent {
         }
     }
 
-    public List<Message> getMessagesAllOrByDate(int conversationName, LocalDateTime date) {
-        if (conversationsRepository.existsById(conversationName)) {
+    public List<Message> getMessagesAllOrByDate(int conversationId, LocalDateTime date) {
+        if (conversationsRepository.existsById(conversationId)) {
             if (date == null) {
                 return StreamSupport.stream(conversationsRepository.findAll().spliterator(), false)
-                        .filter(conversation -> conversation.getName().equals(conversationName))
+                        .filter(conversation -> conversation.getName().equals(conversationId))
                         .flatMap(conversation -> conversation.getMessages().stream())
                         .collect(Collectors.toList());
             } else {
                 return StreamSupport.stream(conversationsRepository.findAll().spliterator(), false)
-                        .filter(conversation -> conversation.getName().equals(conversationName))
+                        .filter(conversation -> conversation.getName().equals(conversationId))
                         .flatMap(conversation -> conversation.getMessages().stream())
                         .filter(message -> message.getTimestamp().isAfter(date))
                         .collect(Collectors.toList());
