@@ -29,9 +29,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeRequests()
                 .antMatchers("/registration").permitAll()
+                .antMatchers("/h2**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic()

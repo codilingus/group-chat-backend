@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class Conversation {
         this.users = users;
     }
 
-    public boolean checkUserPresenceInConversation(User user){
-       return getUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()));
+    public boolean checkUserPresenceInConversation(User user) {
+        return getUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()));
     }
 }
