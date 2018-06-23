@@ -10,11 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 @Configuration
 @Component
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private DbUserDetailsService dbUserDetailsService;
 
@@ -26,20 +28,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable()
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeRequests()
                 .antMatchers("/registration").permitAll()
-                .antMatchers(HttpMethod.OPTIONS,  "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic()
-                .and()
-                .logout()
-                .permitAll()
-                .and()
-                .sessionManagement()
-                .maximumSessions(100).sessionRegistry(sessionRegistry());
+                .and().cors()
+                .and().logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .and().sessionManagement().maximumSessions(100).sessionRegistry(sessionRegistry());
     }
 
     public DaoAuthenticationProvider daoAuthenticationProvider() {
