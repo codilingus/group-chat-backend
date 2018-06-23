@@ -1,9 +1,9 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.authentication.UserSessionContext;
-import com.example.chat.groupchatbackend.repositories.UserRepository;
 import com.example.chat.groupchatbackend.User;
 import com.example.chat.groupchatbackend.UserContext;
+import com.example.chat.groupchatbackend.authentication.UserSessionContext;
+import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "*", allowCredentials = "true", maxAge = 3600L)
 @RestController
 public class UserController {
 
