@@ -183,23 +183,4 @@ public class MessagesController {
         return messagesRepository.findById(messageId).orElseThrow(() -> new RuntimeException("message doesn't exist"));
     }
 
-    @GetMapping("/messages/private/{conversationId}")
-    public List<Message> getPrivateConversationMessagesWithUser(@PathVariable int conversationId,
-                                                                @RequestParam(required = false) Long timestamp) {
-        Conversation conversation = conversationsRepository.findById(conversationId).
-                orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
-
-        User user = userContext.getCurrentUser();
-        if (conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)) {
-            if (timestamp == null) {
-                return getMessagesByDate(conversation, LocalDateTime.MIN);
-            } else {
-                LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                return getMessagesByDate(conversation, date);
-            }
-        } else {
-            throw new RuntimeException("User is not present in this conversation");
-        }
-    }
-
 }
