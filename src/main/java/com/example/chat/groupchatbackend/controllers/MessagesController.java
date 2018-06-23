@@ -59,7 +59,7 @@ public class MessagesController {
             @RequestBody String text) {
         Conversation conversation = getConversation(conversationName);
 
-        Message message = new Message(1, text, LocalDateTime.now());
+        Message message = new Message(userContext.getCurrentUser().getId(), text, LocalDateTime.now());
         messagesRepository.save(message);
         conversation.getMessages().add(message);
         conversationsRepository.save(conversation);
