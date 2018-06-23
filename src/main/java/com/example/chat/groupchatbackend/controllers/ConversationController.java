@@ -73,5 +73,10 @@ public class ConversationController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("not channel");
     }
+
+    @PutMapping("/channels/{id}/leave")
+    public void leaveChannel(@PathVariable int id){
+        conversationsRepository.findAllByConversationType(ConversationType.CHANNEL);
+    }
 }
 
