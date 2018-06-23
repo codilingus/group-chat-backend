@@ -82,7 +82,7 @@ public class ConversationController {
                 .orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
         User currentUser = userContext.getCurrentUser();
 
-        if (conversation.getConversationType().equals(ConversationType.CHANNEL) && currentUser != null) {
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
             if (!conversation.checkIfUserIsInConversation(currentUser)) {
                 conversation.getUsers().add(currentUser);
             }
