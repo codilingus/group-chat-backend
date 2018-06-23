@@ -29,17 +29,22 @@ public class MessagesController {
     @Autowired
     private UserContext userContext;
 
-
-    @GetMapping("/messages/{conversationName}")
-    public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
-        Conversation conversation = getConversation(conversationName);
-
-        if (timestamp == null) {
-            return getMessagesByDate(conversation, LocalDateTime.MIN);
-        } else {
-            LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            return getMessagesByDate(conversation, date);
+    @GetMapping("/messages/channel/{id}")
+    public ResponseEntity getAllMessages(@PathVariable int id , @RequestParam(required = false) Long timestamp) {
+        Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
+            LocalDateTime date = LocalDateTime.MIN;
+            if (timestamp != null) {
+                date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+            }
+            List<Message> result =  getMessagesByDate(conversation, date);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(result);
         }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("not channel");
     }
 
     private List<Message> getMessagesByDate(Conversation conversation, LocalDateTime date) {
