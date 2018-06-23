@@ -1,9 +1,9 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
+import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,10 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", allowCredentials = "true", maxAge = 3600L)
@@ -24,6 +27,10 @@ public class MessagesController {
     private ConversationsRepository conversationsRepository;
     @Autowired
     private MessagesRepository messagesRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserContext userContext;
 
     @GetMapping("/messages/{conversationName}")
     public List<Message> getAllMessages(@PathVariable String conversationName, @RequestParam(required = false) Long timestamp) {
@@ -43,16 +50,62 @@ public class MessagesController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/messages/{conversationName}")
-    public void postMessageToConversation(
-            @PathVariable("conversationName") String conversationName,
-            @RequestBody String text) {
-        Conversation conversation = getConversation(conversationName);
-
-        Message message = new Message(1, text, LocalDateTime.now());
+    @PostMapping("/messages/channel/{id}")
+    public ResponseEntity postChannelMessage(@PathVariable("id") int channelId, @RequestBody String text) {
+        Message message = new Message(userContext.getCurrentUser().getId(), text, LocalDateTime.now());
         messagesRepository.save(message);
-        conversation.getMessages().add(message);
-        conversationsRepository.save(conversation);
+
+        Optional<Conversation> conversation = conversationsRepository.findById(channelId);
+
+        if (conversation.isPresent() && conversation.get().getConversationType().equals(ConversationType.CHANNEL)) {
+            conversation.get().getMessages().add(message);
+            conversationsRepository.save(conversation.get());
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(conversation);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Channel with such id doesn't exist");
+    }
+
+    @PostMapping("/messages/private/{userId}")
+    public ResponseEntity postPrivateMessage(@PathVariable("userId") int userId, @RequestBody String text) {
+        User loggedUser = userContext.getCurrentUser();
+        Message message = new Message(loggedUser.getId(), text, LocalDateTime.now());
+        messagesRepository.save(message);
+
+        List<Integer> userIds = Arrays.asList(loggedUser.getId(), userId);
+
+        List<Conversation> privateConversations = conversationsRepository
+                .findAllByConversationType(ConversationType.DIRECT_MESSAGE);
+
+        Optional<Conversation> conversation = privateConversations.stream()
+                .filter(conversation1 -> conversation1.getUsers()
+                        .stream()
+                        .map(user -> user.getId())
+                        .collect(Collectors.toList())
+                        .equals(userIds))
+                .findAny();
+
+        if (conversation.isPresent()) {
+            conversation.get().getMessages().add(message);
+            conversationsRepository.save(conversation.get());
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(conversation);
+        } else {
+            String newPrivateConversationName = userContext.getCurrentUser().getId() + "-" + userId;
+            Conversation newConversation = new Conversation(newPrivateConversationName, Arrays.asList(message), Arrays.asList(loggedUser, userRepository.findById(userId).get()), ConversationType.DIRECT_MESSAGE);
+            conversationsRepository.save(newConversation);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(conversation);
+        }
     }
 
     private Conversation getConversation(String conversationName) {
