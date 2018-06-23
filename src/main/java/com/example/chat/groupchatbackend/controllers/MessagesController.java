@@ -1,6 +1,8 @@
 package com.example.chat.groupchatbackend.controllers;
 
 import com.example.chat.groupchatbackend.authentication.UserContext;
+import com.example.chat.groupchatbackend.exceptions.BadRequestException;
+import com.example.chat.groupchatbackend.exceptions.NotFoundException;
 import com.example.chat.groupchatbackend.model.Conversation;
 import com.example.chat.groupchatbackend.model.Message;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
@@ -64,7 +66,7 @@ public class MessagesController {
 
     private Conversation getConversationById(int conversationId) {
         return conversationsRepository.findById(conversationId)
-                .orElseThrow(() -> new RuntimeException("Conversation with such name doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Conversation with such name doesn't exist"));
     }
 
     @GetMapping("/messages")
@@ -80,7 +82,7 @@ public class MessagesController {
             message.setText(text);
             return message;
         } else {
-            throw new RuntimeException("You can't edit message");
+            throw new BadRequestException("You can't edit message");
         }
     }
 
@@ -99,7 +101,7 @@ public class MessagesController {
     }
 
     private Message getMessageById(int messageId) {
-        return messagesRepository.findById(messageId).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+        return messagesRepository.findById(messageId).orElseThrow(() -> new NotFoundException("message doesn't exist"));
     }
 
 }
