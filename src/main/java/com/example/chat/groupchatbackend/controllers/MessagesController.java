@@ -17,7 +17,9 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", allowCredentials = "true", maxAge = 3600L)
@@ -84,16 +86,62 @@ public class MessagesController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/messages/{conversationName}")
-    public void postMessageToConversation(
-            @PathVariable("conversationName") String conversationName,
-            @RequestBody String text) {
-        Conversation conversation = getConversation(conversationName);
-
+    @PostMapping("/messages/channel/{id}")
+    public ResponseEntity postChannelMessage(@PathVariable("id") int channelId, @RequestBody String text) {
         Message message = new Message(userContext.getCurrentUser().getId(), text, LocalDateTime.now());
         messagesRepository.save(message);
-        conversation.getMessages().add(message);
-        conversationsRepository.save(conversation);
+
+        Optional<Conversation> conversation = conversationsRepository.findById(channelId);
+
+        if (conversation.isPresent() && conversation.get().getConversationType().equals(ConversationType.CHANNEL)) {
+            conversation.get().getMessages().add(message);
+            conversationsRepository.save(conversation.get());
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(conversation);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Channel with such id doesn't exist");
+    }
+
+    @PostMapping("/messages/private/{userId}")
+    public ResponseEntity postPrivateMessage(@PathVariable("userId") int userId, @RequestBody String text) {
+        User loggedUser = userContext.getCurrentUser();
+        List<Integer> userIds = Arrays.asList(loggedUser.getId(), userId);
+
+        Message message = new Message(loggedUser.getId(), text, LocalDateTime.now());
+        messagesRepository.save(message);
+
+        List<Conversation> privateConversations = conversationsRepository
+                .findAllByConversationType(ConversationType.DIRECT_MESSAGE);
+
+        Optional<Conversation> conversation = privateConversations.stream()
+                .filter(conversation1 -> conversation1.getUsers()
+                        .stream()
+                        .map(user -> user.getId())
+                        .collect(Collectors.toList())
+                        .equals(userIds))
+                .findAny();
+
+        if (conversation.isPresent()) {
+            conversation.get().getMessages().add(message);
+            conversationsRepository.save(conversation.get());
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(conversation);
+        } else {
+            String newPrivateConversationName = userContext.getCurrentUser().getName() + "-" + userRepository.findById(userId).get().getName();
+            Conversation newConversation = new Conversation(newPrivateConversationName, Arrays.asList(message), Arrays.asList(loggedUser, userRepository.findById(userId).get()), ConversationType.DIRECT_MESSAGE);
+            conversationsRepository.save(newConversation);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(newConversation);
+        }
     }
 
     private Conversation getConversation(String conversationName) {
@@ -133,6 +181,25 @@ public class MessagesController {
 
     private Message getMessageById(int messageId) {
         return messagesRepository.findById(messageId).orElseThrow(() -> new RuntimeException("message doesn't exist"));
+    }
+
+    @GetMapping("/messages/private/{conversationId}")
+    public List<Message> getPrivateConversationMessagesWithUser(@PathVariable int conversationId,
+                                                                @RequestParam(required = false) Long timestamp) {
+        Conversation conversation = conversationsRepository.findById(conversationId).
+                orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+
+        User user = userContext.getCurrentUser();
+        if (conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)) {
+            if (timestamp == null) {
+                return getMessagesByDate(conversation, LocalDateTime.MIN);
+            } else {
+                LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return getMessagesByDate(conversation, date);
+            }
+        } else {
+            throw new RuntimeException("User is not present in this conversation");
+        }
     }
 
 }

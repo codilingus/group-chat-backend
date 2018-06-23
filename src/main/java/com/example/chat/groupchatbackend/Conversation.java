@@ -19,7 +19,6 @@ public class Conversation {
     private List<Message> messages;
     private ConversationType conversationType;
 
-    @ElementCollection
     @ManyToMany
     private List<User> users;
 
