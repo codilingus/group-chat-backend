@@ -74,10 +74,10 @@ public class MessagesController {
     @PostMapping("/messages/private/{userId}")
     public ResponseEntity postPrivateMessage(@PathVariable("userId") int userId, @RequestBody String text) {
         User loggedUser = userContext.getCurrentUser();
+        List<Integer> userIds = Arrays.asList(loggedUser.getId(), userId);
+
         Message message = new Message(loggedUser.getId(), text, LocalDateTime.now());
         messagesRepository.save(message);
-
-        List<Integer> userIds = Arrays.asList(loggedUser.getId(), userId);
 
         List<Conversation> privateConversations = conversationsRepository
                 .findAllByConversationType(ConversationType.DIRECT_MESSAGE);
@@ -98,13 +98,13 @@ public class MessagesController {
                     .status(HttpStatus.OK)
                     .body(conversation);
         } else {
-            String newPrivateConversationName = userContext.getCurrentUser().getId() + "-" + userId;
+            String newPrivateConversationName = userContext.getCurrentUser().getName() + "-" + userRepository.findById(userId).get().getName();
             Conversation newConversation = new Conversation(newPrivateConversationName, Arrays.asList(message), Arrays.asList(loggedUser, userRepository.findById(userId).get()), ConversationType.DIRECT_MESSAGE);
             conversationsRepository.save(newConversation);
 
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(conversation);
+                    .body(newConversation);
         }
     }
 

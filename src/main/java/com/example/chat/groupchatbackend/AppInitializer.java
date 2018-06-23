@@ -39,11 +39,9 @@ public class AppInitializer implements CommandLineRunner {
 
         Conversation conversation = new Conversation("conversation1", Arrays.asList(message), Arrays.asList(user), ConversationType.CHANNEL);
         Conversation conversation1 = new Conversation("conversation2", Arrays.asList(message1), Arrays.asList(user, user1), ConversationType.DIRECT_MESSAGE);
-        Conversation conversation2 = new Conversation("conversation3", Arrays.asList(message2), Arrays.asList(user, user2), ConversationType.DIRECT_MESSAGE);
 
         conversationsRepository.save(conversation);
         conversationsRepository.save(conversation1);
-        conversationsRepository.save(conversation2);
 
     }
 }

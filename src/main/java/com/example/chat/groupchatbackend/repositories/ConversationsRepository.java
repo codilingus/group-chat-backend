@@ -18,8 +18,4 @@ public interface ConversationsRepository extends CrudRepository<Conversation, In
 
     List<Conversation> findAllByConversationType(ConversationType conversationType);
 
-    //TODO: Change query
-    //@Query("SELECT c FROM Conversation c JOIN Users u ON (c.users IN :userIds) WHERE c.Conversation_Type = 0")
-    //Optional<Conversation> findDirectMessagesByUsers(@Param("userIds") List<User> users);
-
 }
