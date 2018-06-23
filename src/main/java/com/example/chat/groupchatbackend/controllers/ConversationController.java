@@ -94,5 +94,24 @@ public class ConversationController {
     }
 
 
+
+    @PutMapping("/channels/{id}/leave")
+    public ResponseEntity leaveChannel(@PathVariable int id) {
+        Conversation conversation = conversationsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conversation doesn't exist"));
+
+        User currentUser = userContext.getCurrentUser();
+
+        if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
+            if (conversation.checkUserPresenceInConversation(currentUser)) {
+                conversation.getUsers().removeIf(user -> user.getId().equals(currentUser.getId()));
+                conversationsRepository.save(conversation);
+            }
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Failed to leave channel");
+    }
 }
 

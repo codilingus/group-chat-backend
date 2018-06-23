@@ -5,6 +5,7 @@ import com.example.chat.groupchatbackend.Message;
 import com.example.chat.groupchatbackend.UserContext;
 import com.example.chat.groupchatbackend.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
+import com.example.chat.groupchatbackend.repositories.ReadStatusRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class MessagesController {
     @Autowired
     private MessagesRepository messagesRepository;
     @Autowired
+    private ReadStatusRepository readStatusRepository;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private UserContext userContext;
@@ -39,6 +42,7 @@ public class MessagesController {
         Conversation conversation = conversationsRepository.findById(id).orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
         if (conversation.getConversationType().equals(ConversationType.CHANNEL)) {
             LocalDateTime date = LocalDateTime.MIN;
+            updateReadStatus(conversation);
             if (timestamp != null) {
                 date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
             }
@@ -50,6 +54,30 @@ public class MessagesController {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("not channel");
+    }
+
+    @GetMapping("/messages/private/{conversationId}")
+    public List<Message> getPrivateConversationMessagesWithUser(@PathVariable int conversationId, @RequestParam(required = false) Long timestamp) {
+        Conversation conversation = conversationsRepository.findById(conversationId).
+                orElseThrow(() -> new RuntimeException("conversation doesn't exist"));
+
+        User user = userContext.getCurrentUser();
+        if (conversation.checkUserPresenceInConversation(user) && conversation.getConversationType().equals(ConversationType.DIRECT_MESSAGE)) {
+            updateReadStatus(conversation);
+            if (timestamp == null) {
+                return getMessagesByDate(conversation, LocalDateTime.MIN);
+            } else {
+                LocalDateTime date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return getMessagesByDate(conversation, date);
+            }
+        } else {
+            throw new RuntimeException("User is not present in this conversation");
+        }
+    }
+
+    private void updateReadStatus(Conversation conversation) {
+        ReadStatus readStatus = new ReadStatus(conversation, userContext.getCurrentUser(), LocalDateTime.now());
+        readStatusRepository.save(readStatus);
     }
 
     private List<Message> getMessagesByDate(Conversation conversation, LocalDateTime date) {
