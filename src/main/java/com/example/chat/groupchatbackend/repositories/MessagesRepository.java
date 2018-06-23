@@ -1,6 +1,6 @@
 package com.example.chat.groupchatbackend.repositories;
 
-import com.example.chat.groupchatbackend.Message;
+import com.example.chat.groupchatbackend.model.Message;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

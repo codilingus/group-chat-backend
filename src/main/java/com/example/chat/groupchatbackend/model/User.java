@@ -1,4 +1,4 @@
-package com.example.chat.groupchatbackend;
+package com.example.chat.groupchatbackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

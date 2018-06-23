@@ -1,6 +1,6 @@
-package com.example.chat.groupchatbackend;
+package com.example.chat.groupchatbackend.authentication;
 
-import com.example.chat.groupchatbackend.authentication.MyUserPrincipal;
+import com.example.chat.groupchatbackend.model.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

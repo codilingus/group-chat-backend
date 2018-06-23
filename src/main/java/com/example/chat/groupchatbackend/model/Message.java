@@ -1,4 +1,4 @@
-package com.example.chat.groupchatbackend;
+package com.example.chat.groupchatbackend.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

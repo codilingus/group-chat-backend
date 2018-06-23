@@ -1,7 +1,7 @@
 package com.example.chat.groupchatbackend.repositories;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.ConversationType;
+import com.example.chat.groupchatbackend.model.Conversation;
+import com.example.chat.groupchatbackend.model.ConversationType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

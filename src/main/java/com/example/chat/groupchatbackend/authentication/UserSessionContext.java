@@ -1,6 +1,6 @@
 package com.example.chat.groupchatbackend.authentication;
 
-import com.example.chat.groupchatbackend.User;
+import com.example.chat.groupchatbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Component;

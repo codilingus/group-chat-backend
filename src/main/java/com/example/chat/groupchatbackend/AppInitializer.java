@@ -1,5 +1,9 @@
 package com.example.chat.groupchatbackend;
 
+import com.example.chat.groupchatbackend.model.Conversation;
+import com.example.chat.groupchatbackend.model.ConversationType;
+import com.example.chat.groupchatbackend.model.Message;
+import com.example.chat.groupchatbackend.model.User;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
@@ -7,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 

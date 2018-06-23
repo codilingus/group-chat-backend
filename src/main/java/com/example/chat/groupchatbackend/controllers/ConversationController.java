@@ -1,6 +1,7 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.*;
+import com.example.chat.groupchatbackend.authentication.UserContext;
+import com.example.chat.groupchatbackend.model.*;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,7 @@
 package com.example.chat.groupchatbackend.controllers;
 
-import com.example.chat.groupchatbackend.Conversation;
-import com.example.chat.groupchatbackend.Message;
-import com.example.chat.groupchatbackend.UserContext;
-import com.example.chat.groupchatbackend.*;
+import com.example.chat.groupchatbackend.model.*;
+import com.example.chat.groupchatbackend.authentication.UserContext;
 import com.example.chat.groupchatbackend.repositories.ConversationsRepository;
 import com.example.chat.groupchatbackend.repositories.ReadStatusRepository;
 import com.example.chat.groupchatbackend.repositories.MessagesRepository;
